@@ -1,0 +1,82 @@
+/* style.css */
+
+body {
+  margin: 0;
+  font-family: "Times New Roman", Times, serif;
+  background: url('fundo.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.login-header {
+  text-align: center;
+  color: #000;
+  margin-bottom: 30px;
+}
+
+.login-header h1 {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.login-header p {
+  font-size: 16px;
+  margin: 8px 0 0;
+  font-weight: normal;
+}
+
+.login-box {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  width: 350px;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.forgot {
+  text-align: right;
+  margin-top: -5px;
+  margin-bottom: 15px;
+}
+
+.forgot a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.support-message {
+  display: none;
+  color: #d9534f;
+  font-size: 0.9em;
+  margin-top: 10px;
+  text-align: center;
+}

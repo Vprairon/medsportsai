@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz - MedSportsAI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(0,0,0,.85);display:flex;justify-content:center;gap:30px;padding:15px 0;z-index:999}
+    .navbar a{color:#fff;text-decoration:none;font-weight:bold}
+    .navbar a:hover{text-decoration:underline}
+    .spacer{height:70px}
+    .quiz-container{max-width:800px;margin:0 auto;background:rgba(255,255,255,.97);padding:40px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,.2);font-family:Arial,sans-serif}
+    #question{font-size:18px;font-weight:bold}
+    .options{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+    .options button{padding:10px;border:1px solid #007bff;border-radius:6px;background:#fff;cursor:pointer;text-align:left}
+    .options button:hover{background:#e7f0ff}
+    #next-btn,#restart-btn{margin-top:25px;padding:10px 20px;cursor:pointer;background:#007bff;color:#fff;border:none;border-radius:6px}
+    #result,#details,#suggestions{font-size:16px;margin-top:20px}
+    .correct-answer{color:green;font-weight:bold}
+    .incorrect-answer{color:red;font-weight:bold}
+    .question-review{margin-bottom:20px}
+  </style>
+</head>
+<body>
+  <!-- Navegação topo -->
+  <nav class="navbar">
+  <a href="conteudo.html#texto">Texto</a>
+  <a href="quiz.html">Quiz</a>
+  <a href="autores.html">Autores</a>
+  <a href="conteudo.html#referencias">Referências</a>
+  <a href="index.html">Sair</a>
+</nav>
+
+  <!-- Container principal do quiz -->
+  <div class="quiz-container">
+    <h2>Quiz: IA na Medicina Esportiva</h2>
+    <p id="question"></p>
+    <div class="options" id="options"></div>
+    <button id="next-btn" style="display:none;">Próxima</button>
+    <p id="result" style="display:none;"></p>
+    <div id="details"></div>
+    <div id="suggestions"></div>
+    <button id="restart-btn" style="display:none;">Refazer Quiz</button>
+  </div>
+
+  <script>
+    /* ========================= BANCO DE PERGUNTAS =========================
+       Adicione as 46 questões restantes seguindo o padrão abaixo, incluindo
+       a propriedade "topic" para cada questão. "ans" = índice da alternativa
+       correta (0‑4).                                                     */
+    const questionBank = [
+        {q:'A evolução da computação permitiu que o ser humano processasse informações com:',options:['Menor precisão','Maior rapidez e dinamismo','Pouca confiabilidade','Recursos exclusivamente manuais','Uso limitado de dados'],ans:1,topic:'Fundamentos de computação'},
+        {q:'Segundo o texto, a Inteligência Artificial é considerada um elemento central para:',options:['O passado analógico','O presente apenas','O futuro tecnológico','Áreas não relacionadas ao esporte','Questões políticas'],ans:2,topic:'Conceito de IA'},
+        {q:'A evolução dos exames por imagem na medicina influenciou principalmente:',options:['O uso de medicamentos','A substituição do exame clínico tradicional','A prática de esportes','A popularização da telemedicina','A eliminação de erros médicos'],ans:1,topic:'IA na Saúde'},
+        {q:'Os algoritmos usados em IA na área da saúde são desenvolvidos com base em:',options:['Sugestões de pacientes','Resultados aleatórios','Conhecimento de especialistas','Dados de redes sociais','Avaliações de marketing'],ans:2,topic:'IA na Saúde'},
+        {q:'O texto menciona que smartwatches contribuem para a IA na medicina fornecendo:',options:['Previsão do tempo','Dados de sinais fisiológicos','Acesso à internet','Jogos e entretenimento','Diagnósticos automáticos completos'],ans:1,topic:'IA na saúde'},
+        {q:'No esporte, os métodos tradicionais vêm sendo substituídos por:',options:['Regras mais rígidas','Técnicas artesanais','Ferramentas tecnológicas avançadas','Técnicas de relaxamento','Rotinas de preleção'],ans:2,topic:'Tecnologia no esporte'},
+        {q:'O futebol, historicamente, teve resistência à tecnologia, mas atualmente:',options:['Proibiu o uso de IA','Está totalmente livre da tecnologia','Passou a adotar soluções tecnológicas amplamente','Usa somente para marketing','Continua com métodos exclusivamente analógicos'],ans:2,topic:'Tecnologia no futebol'},
+        {q:'A aplicação de tecnologia no esporte tem como um dos principais objetivos:',options:['Diminuir o engajamento','Reduzir a velocidade dos jogos','Impedir contratações erradas','Aumentar a precisão nas decisões e desempenho','Proteger os patrocinadores'],ans:3,topic:'Tecnologia e desempenho'},
+        {q:'Os clubes utilizam Inteligência Artificial para analisar:',options:['Cores dos uniformes','Gritos da torcida','Desempenho físico e tático de atletas e equipes','Resultados de campeonatos antigos','Reclamações no SAC'],ans:2,topic:'IA no desempenho esportivo'},
+        {q:'O Borussia Dortmund se destaca no uso de IA para:',options:['Reduzir custos operacionais','Contratar patrocinadores','Analisar redes sociais','Ajustar suas táticas de jogo com base em dados','Investir em novos estádios'],ans:3,topic:'Análise tática com IA'},
+        {q:'Para coletar dados dos jogadores, o Borussia Dortmund utiliza:',options:['Impressoras térmicas','Relatórios manuais','Sensores embutidos nos uniformes','Questionários pós-jogo','Monitoramento por rádio'],ans:2,topic:'Tecnologia vestível'},
+        {q:'Qual é o papel das câmeras em campo no contexto do Borussia Dortmund?',options:['Registrar reações da torcida','Rastrear movimento, velocidade e posicionamento dos atletas','Monitorar arbitragem','Gravar entrevistas','Detectar falhas na iluminação'],ans:1,topic:'Monitoramento em tempo real'},
+        {q:'A plataforma TacticAI, desenvolvida em parceria com o Liverpool, tem como foco:',options:['Estratégias ofensivas em contra-ataques','Transmissão de partidas','Controle de gastos','Melhorar estratégias defensivas em escanteios','Criação de novos uniformes'],ans:3,topic:'Plataformas de IA'},
+        {q:'A ferramenta Earpiece, da Twelve Football, utiliza qual recurso popular para comunicação?',options:['Instagram','Telegram','WhatsApp','TikTok','Discord'],ans:2,topic:'Tecnologia de comunicação'},
+        {q:'O Manchester City aplica IA para qual objetivo principal dentro da medicina esportiva?',options:['Aumentar a venda de ingressos','Prever e minimizar o risco de lesões','Reduzir salário dos jogadores','Melhorar a atuação do árbitro','Criar aplicativos de jogo'],ans:1,topic:'Prevenção de lesões'},
+        {q:'O FC Barcelona utiliza Big Data e IA principalmente para:',options:['Promover turismo esportivo','Otimizar formações táticas e monitorar desempenho','Atrair mais patrocinadores','Melhorar a qualidade da grama','Implementar novas regras'],ans:1,topic:'Big Data no futebol'},
+        {q:'Segundo o médico Rodrigo Sasson, a IA auxilia na prevenção de lesões a partir de:',options:['Comentários de torcida','Aplicativos de redes sociais','Análise de perfil físico, histórico e dados de treino do atleta','Sorteios e simulações','Jogos online'],ans:2,topic:'Prevenção de lesões'},
+        {q:'O Vasco, segundo o texto, tem um representante importante no uso de IA. Quem é?',options:['Um torcedor anônimo','O preparador físico','O médico Rodrigo Sasson','O presidente do clube','O técnico da base'],ans:2,topic:'Uso da IA por profissionais'},
+        {q:'A IA deve ser utilizada no contexto esportivo:',options:['Como substituta completa da equipe técnica','Apenas em jogos de videogame','Como ferramenta de apoio à análise clínica e física','Somente nas divisões de base','Para fins publicitários apenas'],ans:2,topic:'Função da IA no esporte'},
+        {q:'O Palmeiras é citado no texto como um dos clubes que:',options:['Não utiliza IA','Está na vanguarda do uso de algoritmos para desempenho tático','Investiu em videogames','Adota métodos analógicos','Desenvolve IA para o mercado financeiro'],ans:1,topic:'Exemplos de clubes com IA'},
+        {q:'O Manchester City utiliza a plataforma:',options:['Barça DataLab','TacticAI','City Football Analytics','ScoutMatch Pro','ClubTech Scout'],ans:2,topic:'Plataformas de IA'},
+        {q:'Uma das funções da IA no Manchester City é:',options:['Design de camisas','Criar slogans','Auxiliar na gestão financeira e em contratações estratégicas','Construir novos estádios','Analisar comentários de fãs'],ans:2,topic:'IA na gestão esportiva'},
+        {q:'No marketing digital, a IA é utilizada principalmente para:',options:['Escolher nomes de jogadores','Criar músicas de torcida','Personalizar campanhas e aumentar o engajamento dos torcedores','Controlar bilheteria','Reduzir o uso de redes sociais'],ans:2,topic:'Marketing esportivo com IA'},
+        {q:'O conteúdo transmídia e interativo é uma estratégia de:',options:['Promoção de ingressos','Engajamento e fidelização de torcedores em múltiplas plataformas','Criação de memes','Redução de custos de mídia','Divulgação de patrocinadores'],ans:1,topic:'Engajamento com torcedores'},
+        {q:'Ferramentas como Google Analytics são utilizadas para:',options:['Criar filtros de câmera','Desenvolver videogames','Coletar e analisar dados de campanhas digitais','Monitorar árbitros','Produzir uniformes'],ans:2,topic:'Ferramentas de análise digital'},
+        {q:'A campanha “Cityzens Giving for Recovery” foi rastreada com auxílio de:',options:['WhatsApp','Google Analytics','TikTok','Meta Ads','Adidas Tracker'],ans:1,topic:'Campanhas com IA'},
+        {q:'O FC Barcelona usou Adobe Analytics para:',options:['Definir o preço de ingressos','Criar formações táticas','Avaliar o engajamento com vídeos ao vivo nas redes sociais','Medir batimentos cardíacos','Simular novos escudos'],ans:2,topic:'Análise de mídias sociais'},
+        {q:'Clubes como o Real Madrid incentivam a participação dos fãs por meio de:',options:['Aulas online','Sorteios secretos','Enquetes e votações interativas em aplicativos','Bonificações salariais','Palestras em campo'],ans:2,topic:'Interação com torcida'},
+        {q:'O aplicativo do Real Madrid permite aos torcedores:',options:['Comprar ações do clube','Escolher o técnico','Votar no jogador da semana e participar de desafios virtuais','Trocar figurinhas','Participar da escalação'],ans:2,topic:'Apps interativos esportivos'},
+        {q:'Os dispositivos vestíveis (wearables) são usados para monitorar:',options:['Nível de torcida','Preço de ingressos','Dados físicos dos atletas em tempo real','Voz do técnico','Clima do estádio'],ans:2,topic:'Tecnologia vestível'},
+        {q:'A IA é acessível igualmente a todos os clubes?',options:['Sim, é totalmente gratuita','Apenas a clubes de segunda divisão','Depende de convênios','Não, representa um alto investimento para clubes com estrutura limitada','Só pode ser usada na Europa'],ans:3,topic:'Desigualdade no acesso à IA'},
+        {q:'Os clubes utilizam a IA em tempo real para:',options:['Desenhar novos logos','Analisar arbitragem','Simular resultados antigos','Avaliar interações nas redes sociais','Ajustar treinos e prevenir lesões com dados atuais'],ans:4,topic:'IA em tempo real'},
+        {q:'A IA é útil na prevenção de lesões pois permite:',options:['Medir pressão do público','Escolher patrocinadores','Otimizar a iluminação do estádio','Criar memes','Analisar padrões físicos que indicam risco'],ans:4,topic:'IA e prevenção'},
+        {q:'A análise científica no esporte tem permitido:',options:['Mais paralisações','Maior aleatoriedade','Compreensão aprofundada do jogo','Diminuição da competição','Retorno a métodos antigos'],ans:2,topic:'Ciência do esporte'},
+        {q:'Com suporte tecnológico, as equipes conseguem se preparar:',options:['De forma improvisada','Sem planejamento','Com recursos ultrapassados','De forma mais eficiente','Com menor motivação'],ans:3,topic:'Preparação esportiva com IA'},
+        {q:'No futebol brasileiro, a análise nas categorias de base ainda está:',options:['Muito avançada','Em decadência','Totalmente estruturada','Em fase de testes finais','Em desenvolvimento'],ans:4,topic:'Categorias de base'},
+        {q:'Grande parte dos estudos sobre análise de desempenho no futebol está focada em:',options:['Futebol de rua','Categorias infantis','Futebol amador','Futebol profissional','Futsal'],ans:3,topic:'Pesquisa em desempenho esportivo'},
+        {q:'A utilização da IA no Palmeiras e no Bayern tem como objetivo:',options:['Estudar gramados','Aumentar o preço dos ingressos','Criar uniformes personalizados','Gerar memes táticos','Otimizar desempenho físico e decisões técnicas'],ans:4,topic:'Exemplos de uso estratégico da IA'},
+        {q:'O uso da IA contribui para que os técnicos tomem decisões mais:',options:['Rápidas e imprecisas','Alegres','Instintivas','Precipitadas','Precisam com base em dados'],ans:4,topic:'Tomada de decisão com IA'},
+        {q:'A IA contribui para o entendimento dos padrões de:',options:['Treino dos árbitros','Humor da torcida','Padrões físicos e risco de lesão','Uniformes históricos','Vendas de camisas'],ans:2,topic:'Análise de desempenho'},
+        {q:'Algoritmos de IA no futebol têm se mostrado úteis na área de:',options:['Jardinagem','Culinária esportiva','Scouting e análise tática','Contabilidade','Psicologia da torcida'],ans:2,topic:'IA e scouting'},
+        {q:'Dispositivos vestíveis permitem a coleta de dados sobre:',options:['Aquecimento da arquibancada','Rotinas da imprensa','Condicionamento físico dos atletas','Desempenho financeiro do clube','Estatísticas de venda'],ans:2,topic:'Monitoramento físico'},
+        {q:'Para clubes com recursos limitados, a IA representa:',options:['Lucro imediato','Tecnologia obsoleta','Investimento considerável','Ferramenta opcional','Custo irrelevante'],ans:2,topic:'Acesso à tecnologia'},
+        {q:'O monitoramento da carga de trabalho dos atletas tem como foco:',options:['Controlar entrevistas','Evitar propagandas','Prever tempestades','Reforçar salários','Prevenir lesões'],ans:4,topic:'Gestão de carga'},
+        {q:'A análise de dados físicos feita pela IA ocorre em tempo:',options:['De espera','Lento','Real','Oculto','Parcial'],ans:2,topic:'Análise em tempo real'},
+        {q:'O ajuste no treinamento com base em IA busca:',options:['Reduzir custos com energia','Melhorar interação com a torcida','Aumentar temperatura do estádio','Evitar escândalos','Acelerar recuperação dos atletas'],ans:4,topic:'Treinamento e recuperação'},
+        {q:'A medicina preventiva no esporte tem sido fortalecida pela IA através da:',options:['Ajuste na iluminação','Troca de técnicos','Venda de ingressos','Limpeza automatizada','Redução de lesões'],ans:4,topic:'Medicina esportiva'},
+        {q:'A qualificação profissional combinada à tecnologia resulta em:',options:['Aumento de erros','Confusão tática','Perda de desempenho','Aleatoriedade nos treinos','Maior eficiência na preparação'],ans:4,topic:'Tecnologia e qualificação'},
+        {q:'Quais foram os clubes de futebol citados no texto que utilizam inteligência artificial:',options:['Chelsea, Liverpool, São Paulo, Santos, Criciúma','Liverpool, São Paulo, Manchester United, Barcelona e Palmeiras','Liverpool, Palmeiras, Vasco, Manchester City e Barcelona','Flamengo, Arsenal, Vasco, Palmeiras, Barcelona e Atlético de Madrid.','Sampaio Correa, Mirassol, Bangu, Manchester City, Barcelona'],ans:2,topic:'Clubes com IA'},
+        {q:'Quais foram as ferramentas de inteligência artificial usadas pelos clubes citadas no texto:',options:['Chat GPT, Perplexity, Deepseek, Google Analytics','Google DeepMind (TaticAI), Twelve Football (Earpiece), Catapult, Barça Innovation Hub, City Football Analytics, Algoritmos de Machine Learning, Google Analytics, Adobe Analytics, Salesforce Marketing Cloud, Hubspot.','TaticAI, Earpiece, Catapult, Machine Learning, Chat GPT','Bitcoin, Machine Learning, Gemini, Perplexity','TaticAI, Earpiece, Catapult, Barça Innovation Hub, City Football Analytics, Ethereum'],ans:1,topic:'Ferramentas de IA'}
+        ];
+
+    /* ========================= LÓGICA DO QUIZ ========================= */
+    let selected = [];
+    let current = 0;
+    let score = 0;
+    let answers = [];
+
+    const questionEl   = document.getElementById('question');
+    const optionsEl    = document.getElementById('options');
+    const nextBtn      = document.getElementById('next-btn');
+    const resultEl     = document.getElementById('result');
+    const detailsEl    = document.getElementById('details');
+    const suggestionsEl= document.getElementById('suggestions');
+    const restartBtn   = document.getElementById('restart-btn');
+
+    function initQuiz(){
+      selected = [...questionBank].sort(()=>Math.random()-0.5).slice(0,10);
+      current = 0; score = 0; answers = [];
+      resultEl.style.display = 'none';
+      detailsEl.innerHTML = ''; suggestionsEl.innerHTML='';
+      restartBtn.style.display = 'none';
+      questionEl.style.display='block'; optionsEl.style.display='flex';
+      loadQuestion();
+    }
+
+    function loadQuestion(){
+      const item = selected[current];
+      questionEl.textContent = `${current+1}. ${item.q}`;
+      optionsEl.innerHTML = '';
+      item.options.forEach((opt,idx)=>{
+        const btn = document.createElement('button');
+        btn.textContent = String.fromCharCode(65+idx)+') '+opt;
+        btn.onclick = ()=>handleAnswer(idx);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(idx){
+      const item = selected[current];
+      const correct = idx === item.ans;
+      if(correct) score++;
+      answers.push({question:item.q,selected:idx,correct:item.ans,options:item.options,topic:item.topic});
+
+      [...optionsEl.children].forEach((b,i)=>{
+        b.disabled=true;
+        if(i===item.ans) b.style.background='#c8e6c9';
+        if(i===idx && idx!==item.ans) b.style.background='#ffcdd2';
+      });
+      nextBtn.style.display='inline-block';
+    }
+
+    nextBtn.onclick = ()=>{
+      current++; nextBtn.style.display='none';
+      if(current < selected.length){ loadQuestion(); }
+      else { showResult(); }
+    };
+
+    restartBtn.onclick = initQuiz;
+
+    function showResult(){
+      questionEl.style.display='none'; optionsEl.style.display='none';
+      resultEl.style.display='block'; restartBtn.style.display='inline-block';
+      resultEl.textContent=`Você acertou ${score} de ${selected.length} perguntas!`;
+
+      /* ---- Detalhes pergunta a pergunta ---- */
+      const detalhes = answers.map((res,i)=>{
+        const userA = res.options[res.selected];
+        const corrA = res.options[res.correct];
+        const status = res.selected===res.correct?'<span class="correct-answer">Acertou</span>':'<span class="incorrect-answer">Errou</span>';
+        return `<div class="question-review"><strong>${i+1}. ${res.question}</strong><br>Sua resposta: ${userA}<br>Resposta correta: ${corrA}<br>Resultado: ${status}</div>`;
+      }).join('');
+      detailsEl.innerHTML = `<h3>Revisão das respostas:</h3>${detalhes}`;
+
+      /* ---- Sugestões de temas ---- */
+      const wrongTopics = [...new Set(answers.filter(a=>a.selected!==a.correct).map(a=>a.topic))];
+      if(wrongTopics.length){
+        suggestionsEl.innerHTML = `<h3>Temas para revisar:</h3><ul>${wrongTopics.map(t=>`<li>${t}</li>`).join('')}</ul>`;
+      }else{
+        suggestionsEl.innerHTML = `<h3 class="correct-answer">Parabéns! Você acertou tudo. Sua jornada no conhecimento esportivo está no caminho certo! 🏆</h3>`;
+      }
+    }
+
+    /* Iniciar */
+    initQuiz();
+  </script>
+</body>
+</html>

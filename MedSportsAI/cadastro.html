@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - MedSportsAI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Times New Roman", Times, serif;
+      background: url('fundo.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .login-header {text-align:center;color:#000;margin-bottom:30px}
+    .login-header h1{font-size:36px;font-weight:bold;margin:0}
+    .login-header p{font-size:16px;margin:8px 0 0}
+    .login-box{
+      background:rgba(255,255,255,.95);
+      padding:40px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,.2);width:350px;
+    }
+    .login-box input{width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:5px}
+    .login-box button{width:100%;padding:10px;background:#007bff;color:#fff;border:none;border-radius:5px;cursor:pointer;margin-top:10px}
+    .forgot{text-align:right;margin-top:-5px;margin-bottom:15px}
+    .forgot a{color:#007bff;text-decoration:none;font-size:.9em;cursor:pointer}
+    .support-message{display:none;color:#d9534f;font-size:.9em;margin-top:10px;text-align:center}
+    .register{text-align:center;margin-top:20px;font-size:.9em}
+    .register a{color:#007bff;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="login-header">
+      <h1>MedSportsAI</h1>
+      <p>Sua jornada no conhecimento esportivo começa com inteligência.</p>
+    </div>
+
+    <div class="login-box">
+      <form action="conteudo.html">
+        <input type="text" id="username" name="username" placeholder="Nome de Usuário" required />
+        <input type="email" id="email" name="email" placeholder="E-mail" required />
+        <input type="password" id="password" name="password" placeholder="Senha" required />
+        <div class="forgot"><a onclick="showSupportMessage()">Esqueci minha senha</a></div>
+        <div id="supportMessage" class="support-message">Contate o suporte para recuperar sua senha.</div>
+        <button type="submit">Confirmar</button>
+      </form>
+      <div class="register">Não tem uma conta? <a href="cadastro.html">Cadastre-se</a></div>
+    </div>
+  </div>
+<script>
+  function showSupportMessage(){document.getElementById('supportMessage').style.display='block';}
+</script>
+</body>
+</html>
